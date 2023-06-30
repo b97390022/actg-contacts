@@ -1,5 +1,5 @@
-from config import config
-from ldap_service import LDAPService
+from src.config import config
+from src.ldap_service import LDAPService
 import interactions
 from interactions.ext import prefixed_commands
 from loguru import logger

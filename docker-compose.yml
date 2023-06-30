@@ -1,9 +1,7 @@
 services:
   actg-contacts:
-    build:
-      context: .
-    image: shau1943/actg-contacts:latest
+    image: shau1943/actg-contacts:main
     container_name: actg-contacts
     restart: unless-stopped
     volumes:
-        - ./config.json:/actg-contacts/config.json
+      - ./config.json:/actg-contacts/config.json

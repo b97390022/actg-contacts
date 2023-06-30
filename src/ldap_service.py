@@ -1,4 +1,4 @@
-from config import config
+from src.config import config
 from ldap3 import Server, Connection, ALL
 import re
 
