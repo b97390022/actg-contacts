@@ -4,8 +4,7 @@ import re
 
 class LDAPService:
     def __init__(self) -> None:
-        self.server: Server = Server(config.ldap_server, get_info=ALL) 
-        self.conn: Connection = Connection(self.server, config.ldap_user, config.ldap_password, auto_bind=True)
+        self.server: Server = Server(config.ldap_server, get_info=ALL)
         self.attributes: dict = {
             "cn": "姓名",
             "st": "位置",
@@ -77,14 +76,12 @@ class LDAPService:
 
     def search(self, search_string: str, max_length: int):
         search_string = search_string.replace("(","\\28").replace(")","\\29")
-        self.conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=self.attributes.keys())
-        return self.serialize_to_split_list(self.conn.entries, max_length)
+        with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
+            conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=self.attributes.keys())
+        return self.serialize_to_split_list(conn.entries, max_length)
     
     def autocomplete_search(self, search_string: str):
         search_string = search_string.replace("(","\\28").replace(")","\\29")
-        self.conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=["cn"])
-        return self.serialize_autocomplete(self.conn.entries)
-    
-if __name__ == "__main__":
-    ldap_service = LDAPService()
-    r = ldap_service.search("何天瑜",2000)
+        with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
+            conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=["cn"])
+        return self.serialize_autocomplete(conn.entries)
