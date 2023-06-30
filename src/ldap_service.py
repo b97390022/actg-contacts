@@ -78,10 +78,10 @@ class LDAPService:
         search_string = search_string.replace("(","\\28").replace(")","\\29")
         with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
             conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=self.attributes.keys())
-        return self.serialize_to_split_list(conn.entries, max_length)
+            return self.serialize_to_split_list(conn.entries, max_length)
     
     def autocomplete_search(self, search_string: str):
         search_string = search_string.replace("(","\\28").replace(")","\\29")
         with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
             conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=["cn"])
-        return self.serialize_autocomplete(conn.entries)
+            return self.serialize_autocomplete(conn.entries)
