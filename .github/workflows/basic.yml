@@ -33,8 +33,8 @@ jobs:
         load: true # Export to Docker Engine rather than pushing to a registry
         tags: ${{ github.run_id }}
         build-args: |
-          SMB_USER = ${{ secrets.SMB_USER }}
-          SMB_PWD = ${{ secrets.SMB_PWD }}
+          SMB_USER=${{ secrets.SMB_USER }}
+          SMB_PWD=${{ secrets.SMB_PWD }}
         target: test
         cache-from: type=gha
         cache-to: type=gha,mode=max
@@ -86,8 +86,8 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         build-args: |
-          SMB_USER = ${{ secrets.SMB_USER }}
-          SMB_PWD = ${{ secrets.SMB_PWD }}
+          SMB_USER=${{ secrets.SMB_USER }}
+          SMB_PWD=${{ secrets.SMB_PWD }}
         labels: ${{ steps.meta.outputs.labels }} 
         cache-from: type=gha
         cache-to: type=gha,mode=max
