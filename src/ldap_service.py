@@ -1,3 +1,4 @@
+import asyncio
 from src.config import config
 from ldap3 import Server, Connection, ALL
 import re
@@ -74,10 +75,10 @@ class LDAPService:
             "value": getattr(entry, "cn").value,
         } for entry in entries]
 
-    def search(self, search_string: str, max_length: int):
+    async def search(self, search_string: str, max_length: int):
         search_string = search_string.replace("(","\\28").replace(")","\\29")
         with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
-            conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=self.attributes.keys())
+            conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=self.attributes.keys())      
             return self.serialize_to_split_list(conn.entries, max_length)
     
     def autocomplete_search(self, search_string: str):
@@ -85,3 +86,11 @@ class LDAPService:
         with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
             conn.search("dc=actgenomics,dc=com", f'(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))', attributes=["cn"])
             return self.serialize_autocomplete(conn.entries)
+
+if __name__ == "__main__":
+    async def main():
+        ldap_service = LDAPService()
+        r = ldap_service.search("Bruce", 2000)
+        print("do next job")
+        print(await r)
+    asyncio.run(main())

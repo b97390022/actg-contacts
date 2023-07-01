@@ -1,3 +1,4 @@
+import asyncio
 from src.config import config
 from src.ldap_service import LDAPService
 import interactions
@@ -9,7 +10,7 @@ DISCORD_CHOICE_LENGTH = 25
 MESSAGE_DELETE_DELAY = 600
 
 intents = interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT
-bot = interactions.Client(intents=intents, sync_interactions=True, asyncio_debug=True, logger=logger)
+bot = interactions.Client(intents=intents, sync_interactions=True, asyncio_debug=False, logger=logger)
 prefixed_commands.setup(bot)
 ldap_service = LDAPService()
 
@@ -27,9 +28,11 @@ async def on_ready():
 )
 async def search_contacts(ctx: interactions.SlashContext, search_string: str):
     await ctx.defer()
-    result_lists = ldap_service.search(search_string, DISCORD_MESSAGE_LENGTH)
-    for r in result_lists:
-        message = await ctx.send(r)
+    ldap_coro = ldap_service.search(search_string, DISCORD_MESSAGE_LENGTH)
+    print("this part to parse csv")
+    
+    for result_list in await ldap_coro:
+        message = await ctx.send(result_list)
         await message.delete(MESSAGE_DELETE_DELAY)
 
 @search_contacts.autocomplete("search_string")

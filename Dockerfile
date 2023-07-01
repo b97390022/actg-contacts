@@ -1,15 +1,28 @@
-FROM python:3.11.3-slim-bullseye as base
+FROM python:3.11.3-slim-buster as base
 
-WORKDIR /actg-contacts
+ENV SOURCE_FOLDER  /actg-contacts
+ENV PUBLIC_FOLDER  //192.168.5.20/Public
+ENV TARGET_FOLDER  /mnt/Public
 
-COPY . /actg-contacts
+ARG SMB_USER
+ARG SMB_PWD
 
-ADD requirements.txt /actg-contacts
+WORKDIR "${SOURCE_FOLDER}"
+
+RUN apt-get update -y && apt-get upgrade -y \
+    && apt-get install -y samba-client samba-common nfs-common cifs-utils sudo \
+    && rm -rf /var/lib/apt/lists/*
+
+# mkdir of data src folder
+RUN mkdir "${TARGET_FOLDER}" && echo "username=${SMB_USER}\npassword=${SMB_PWD}\n" > "${SOURCE_FOLDER}"/.smbcredentials && chmod 600 "${SOURCE_FOLDER}"/.smbcredentials \
+    && echo "${PUBLIC_FOLDER} ${TARGET_FOLDER} cifs credentials=${SOURCE_FOLDER}/.smbcredentials,iocharset=utf8" > /etc/fstab
+
+ADD requirements.txt "${SOURCE_FOLDER}"
 RUN pip install -r requirements.txt
 
-COPY . /actg-contacts
+COPY . "${SOURCE_FOLDER}"
 
-CMD ["python", "-m", "src.main"]
+CMD ["/bin/bash", "sudo", "-c", "sudo mount -a && python -m src.main"]
 
 #########################
 FROM base as test
