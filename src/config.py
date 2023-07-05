@@ -3,6 +3,7 @@ import json
 from pathlib import Path
 from loguru import logger
 
+
 @logger.catch
 def init_config():
     config_file_path = Path("config.json").resolve()
@@ -10,7 +11,8 @@ def init_config():
         config_file = f.read()
     config_json = json.loads(config_file)
     return Config(**config_json)
-    
+
+
 @dataclass
 class Config:
     env: str
@@ -20,6 +22,7 @@ class Config:
     discord_token: str
 
     def __post_init__(self):
-        logger.info(f"loading config with \"{self.env}\" environment.")
+        logger.info(f'loading config with "{self.env}" environment.')
+
 
 config = init_config()

@@ -11,7 +11,14 @@ python = "^3.11"
 ldap3 = "^2.9.1"
 loguru = "^0.7.0"
 discord-py-interactions = "^5.7.0"
+redis = {extras = ["hiredis"], version = "^4.6.0"}
+watchdog = "^3.0.0"
+editdistance = "^0.6.2"
+openpyxl = "^3.1.2"
 
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.3.0"
 
 [build-system]
 requires = ["poetry-core"]

@@ -1,4 +1,4 @@
-FROM python:3.11.3-slim-buster as base
+FROM python:3.11.3-slim-bullseye as base
 
 ENV SOURCE_FOLDER  /actg-contacts
 ENV PUBLIC_FOLDER  //192.168.5.20/Public
@@ -22,7 +22,9 @@ RUN pip install -r requirements.txt
 
 COPY . "${SOURCE_FOLDER}"
 
-CMD ["/bin/bash", "sudo", "-c", "sudo mount -a && python -m src.main"]
+USER root
+
+CMD mount -a && python -m src.main
 
 #########################
 FROM base as test
