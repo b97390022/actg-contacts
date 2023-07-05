@@ -113,7 +113,7 @@ if __name__ == "__main__":
 
     async def main():
         ldap_service = LDAPService()
-        r = await ldap_service.search("陳", 2000)
+        r = await ldap_service.search("Jian Siao Yu (簡孝羽)", 2000)
         print("do next job")
         print(r)
 
