@@ -1,13 +1,10 @@
-import asyncio
 from src.config import config
 from src.db import RedisClient
 from src.contact_service import ContactService
 from src.ldap_service import LDAPService
-from src.utils import caculate_editdistance
 import interactions
 from interactions.ext import prefixed_commands
 from loguru import logger
-import re
 
 DISCORD_MESSAGE_LENGTH = 2000
 DISCORD_CHOICE_LENGTH = 25

@@ -1,8 +1,12 @@
 # actg-contacts
 
-actg-contacts a Python Discord Bot to search contacts of ACTGenomics.
+actg-contacts a Python Discord Bot to search contacts of ACTGenomics✨.
 
 [![Docker Build](https://github.com/b97390022/actg-contacts/actions/workflows/basic.yml/badge.svg)](https://github.com/b97390022/actg-contacts/actions/workflows/basic.yml)
+
+# Datasource
+- LDAP
+- Excel file (//tp-fs01/Public/公司通訊錄與座位表/* 通訊錄 *.xlsx)
 
 ## Create Confin.json
 Please place the config.json file into the actg-contacts folder and replace the corresponding values.
