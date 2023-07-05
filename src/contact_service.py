@@ -209,10 +209,10 @@ class ContactService:
         contact_dict = self.make_dict("ACTG")
         results = []
         for contact_name in contact_dict:
-            r = re.findall(r"\(.*\)", search_string)
-            if r and re.search(r[0], contact_name):
+            r = re.findall(r"\(.*\)", search_string, re.IGNORECASE)
+            if r and re.search(r[0], contact_name, re.IGNORECASE):
                 results.append(contact_dict[contact_name])
-            elif re.search(search_string, contact_name):
+            elif re.search(search_string, contact_name, re.IGNORECASE):
                 results.append(contact_dict[contact_name])
         return self.serialize_to_split_list(results, max_length)
 
