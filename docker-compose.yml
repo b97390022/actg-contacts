@@ -8,6 +8,7 @@ services:
 
   actg-contacts:
     image: shau1943/actg-contacts:latest
+    pull_policy: always
     container_name: actg-contacts
     restart: unless-stopped
     command: 
