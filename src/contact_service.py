@@ -149,7 +149,7 @@ class ContactService:
         ]
 
     def make_dict(self, sheet_name: str):
-        sheet = load_workbook(self.contact_file_path).get_sheet_by_name(sheet_name)
+        sheet = load_workbook(self.contact_file_path)[sheet_name]
         self.col_index = self._parse_contact(sheet)
         excel_file_name = Path(self.contact_file_path).name
         # Make dictionary
@@ -206,18 +206,27 @@ class ContactService:
         return result_list
 
     async def search(self, search_string: str, max_length: int):
-        search_string = search_string.replace("(", "\\28").replace(")", "\\29")
         contact_dict = self.make_dict("ACTG")
         results = []
         for contact_name in contact_dict:
-            if re.match(search_string, contact_name):
+            r = re.findall(r"\(.*\)", search_string)
+            if r and re.search(r[0], contact_name):
+                results.append(contact_dict[contact_name])
+            elif re.search(search_string, contact_name):
                 results.append(contact_dict[contact_name])
         return self.serialize_to_split_list(results, max_length)
 
 
 if __name__ == "__main__":
+    import asyncio
+
     contact_service = ContactService()
-    contact_service.make_dict("ACTG")
+
+    async def main():
+        r = await contact_service.search("Jian Siao Yu (簡孝羽)", 2000)
+        print(r)
+
+    asyncio.run(main())
     # logger.info(contact_service.contact_file_path)
     # observer = PollingObserver()
     # observer.schedule(MyEventHandler(), path=contact_service.src_path, recursive=False)

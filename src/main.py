@@ -41,15 +41,13 @@ async def search_contacts(ctx: interactions.SlashContext, search_string: str):
     ldap_coro = ldap_service.search(search_string, DISCORD_MESSAGE_LENGTH)
     contact_coro = contact_service.search(search_string, DISCORD_MESSAGE_LENGTH)
 
-    await ctx.send("**底下是LDAP部分**")
-
     for result_list in await ldap_coro:
+        result_list[0] = "**----------- LDAP ----------**\n" + result_list[0]
         message = await ctx.send(result_list)
         await message.delete(MESSAGE_DELETE_DELAY)
 
-    await ctx.send("**底下是Excel部分**")
-
     for result_list in await contact_coro:
+        result_list[0] = "**----------- Excel ----------**\n" + result_list[0]
         message = await ctx.send(result_list)
         await message.delete(MESSAGE_DELETE_DELAY)
 
