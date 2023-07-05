@@ -22,7 +22,7 @@ class MyEventHandler(FileSystemEventHandler):
 
 class ContactService:
     def __init__(self) -> None:
-        self.src_path: str = r"/mnt/Public/Bruce/公司通訊錄及座位表"
+        self.src_path: str = r"/mnt/Public/公司通訊錄及座位表"
         self.contact_file: str = "*通訊錄*.xlsx"
         self.contact_file_path: str = get_file_path(self.src_path, self.contact_file)
         self.col_index: dict = {
