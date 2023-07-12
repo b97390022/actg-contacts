@@ -24,7 +24,6 @@ class ContactService:
     def __init__(self) -> None:
         self.src_path: str = r"/mnt/Public/公司通訊錄及座位表"
         self.contact_file: str = "*通訊錄*.xlsx"
-        self.contact_file_path: str = get_file_path(self.src_path, self.contact_file)
         self.col_index: dict = {
             "idx_phone": 0,
             "idx_office": 1,
@@ -149,9 +148,10 @@ class ContactService:
         ]
 
     def make_dict(self, sheet_name: str):
-        sheet = load_workbook(self.contact_file_path)[sheet_name]
+        contact_file_path = get_file_path(self.src_path, self.contact_file)
+        sheet = load_workbook(contact_file_path)[sheet_name]
         self.col_index = self._parse_contact(sheet)
-        excel_file_name = Path(self.contact_file_path).name
+        excel_file_name = Path(contact_file_path).name
         # Make dictionary
         dict_mapping_data = {"*version": excel_file_name, "*ver": excel_file_name}
 
