@@ -266,33 +266,29 @@ class SeatingChartController:
 
 
     async def search(self, search_string: str):
-        try:
-            app = xw.App(visible=False)
-            search_string = self._formalize(search_string)
-            seating_chart_file_path = get_file_path(self.src_path, self.seating_chart_file)
-            images_path = []
-            with app.books.open(seating_chart_file_path, read_only=True) as wb:
+        search_string = self._formalize(search_string)
+        seating_chart_file_path = get_file_path(self.src_path, self.seating_chart_file)
+        images_path = []
+        with xw.Book(seating_chart_file_path, read_only=True) as wb:
 
-                for sheet_name in  self._get_all_sheets(wb):
-                    sheet: xw.Sheet = wb.sheets[sheet_name]
-                    border = self._get_border(sheet)
+            for sheet_name in  self._get_all_sheets(wb):
+                sheet: xw.Sheet = wb.sheets[sheet_name]
+                border = self._get_border(sheet)
 
-                    l=[]
-                    for (cell, x, y) in self._iter_seating_chart_data(sheet, border):
-                        value = self._formalize(cell.value)
-                        if value != "" and (search_string in value or value in search_string):
-                            file_name = f'images/{uuid.uuid4()}.png'
-                            l.append((file_name, x, y))
-                            sheet.range((1,1), border).to_png(file_name)
-                            images_path.append(file_name)
-                            break
-                    self.draw_circle_on_png(l)
-                    if images_path:
+                l=[]
+                for (cell, x, y) in self._iter_seating_chart_data(sheet, border):
+                    value = self._formalize(cell.value)
+                    if value != "" and (search_string in value or value in search_string):
+                        file_name = f'images/{uuid.uuid4()}.png'
+                        l.append((file_name, x, y))
+                        sheet.range((1,1), border).to_png(file_name)
+                        images_path.append(file_name)
                         break
+                self.draw_circle_on_png(l)
+                if images_path:
+                    break
 
-            return images_path
-        finally:
-            app.quit()
+        return images_path
 
 if __name__ == "__main__":
     import asyncio

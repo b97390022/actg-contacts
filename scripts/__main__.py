@@ -1,5 +1,7 @@
 import subprocess
 
+from src.config import config
+
 
 def prepare():
     subprocess.run(["pre-commit install"], check=False, shell=True)
@@ -12,7 +14,7 @@ def lint():
 
 def build(option: str):
     subprocess.run([
-        f"poetry export --without-hashes --format=requirements.txt > requirements.txt && docker buildx build --platform linux/amd64 -t shau1943/actg-contacts:latest . {option}",
+        f"poetry export --without-hashes --format=requirements.txt > requirements.txt && docker buildx build --platform linux/amd64 --build-arg='SMB_USER={config.smb_user}' --build-arg='SMB_PWD={config.smb_password}' -t shau1943/actg-contacts:latest . {option}",
     ], check=False, shell=True)
 
 def build_load():

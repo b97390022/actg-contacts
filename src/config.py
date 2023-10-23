@@ -30,6 +30,8 @@ class Config:
     ldap_user: str
     ldap_password: str
     discord_token: str
+    smb_user: str
+    smb_password: str
 
     def __post_init__(self):
         logger.info(f'loading config with "{self.env}" environment')
