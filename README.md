@@ -17,7 +17,9 @@ Please place the config.json file into the actg-contacts folder and replace the 
     "ldap_server": "ldap_server",
     "ldap_user": "ldap_user",
     "ldap_password": "ldap_password",
-    "discord_token": "discord_token"
+    "discord_token": "discord_token",
+    "smb_user": "sub_user",
+    "smb_password": "smb_password"
 }
 ```
 
@@ -49,13 +51,13 @@ pre-commit install
 
 #### Poetry scripts
 ```bash
-poetry run prepare // run prepare
-poetry run audit // run audit
-poetry run lint // run linting
-poetry run build:load // docker build and load to local engine
-poetry run build:push // docker build and push to dockerhub
-poetry run start // start entrypoint main.py
-poetry run test // run linting
+poetry run prepare
+poetry run audit
+poetry run lint
+poetry run build:load
+poetry run build:push
+poetry run start
+poetry run test
 ```
 
 ## Contributing
