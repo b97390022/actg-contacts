@@ -1,13 +1,13 @@
-import asyncio
-from src.config import config
-from ldap3 import Server, Connection, ALL
 import re
-from loguru import logger
+from typing import Any
+
+from src.component.ldap import LDAPServer
+from src.config import config
 
 
-class LDAPService:
+class LDAPController:
     def __init__(self) -> None:
-        self.server: Server = Server(config.ldap_server, get_info=ALL)
+        self.ldap_server = LDAPServer(host=config.ldap_server, user=config.ldap_user, password=config.ldap_password)
         self.attributes: dict = {
             "cn": "姓名",
             "st": "位置",
@@ -34,7 +34,7 @@ class LDAPService:
         text_string += self.split_line
         return text_string
 
-    def serialize_to_split_list(self, entries: list, max_length: int):
+    def serialize_to_split_list(self, entries: list[Any], max_length: int):
         split_line_length = self.get_split_line_length()
         m_length = max_length - 2 * split_line_length
         l = len(entries)
@@ -80,40 +80,37 @@ class LDAPService:
         ]
 
     async def get_all_names(self):
-        with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
-            conn.search(
-                "dc=actgenomics,dc=com",
-                f"(&(objectCategory=person)(objectClass=organizationalPerson))",
-                attributes=["cn"],
-            )
-            return [entry["cn"].value for entry in conn.entries]
+        entries = self.ldap_server.search(
+            "dc=actgenomics,dc=com",
+            "(&(objectCategory=person)(objectClass=organizationalPerson))",
+            attributes=["cn"],
+        )
+        return [entry["cn"].value for entry in entries]
 
     def autocomplete_search(self, search_string: str):
         search_string = search_string.replace("(", "\\28").replace(")", "\\29")
-        with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
-            conn.search(
-                "dc=actgenomics,dc=com",
-                f"(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))",
-                attributes=["cn"],
-            )
-            return self.serialize_autocomplete(conn.entries)
+        entries = self.ldap_server.search(
+            "dc=actgenomics,dc=com",
+            f"(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))",
+            attributes=["cn"],
+        )
+        return self.serialize_autocomplete(entries)
 
     async def search(self, search_string: str, max_length: int):
         search_string = search_string.replace("(", "\\28").replace(")", "\\29")
-        with Connection(self.server, config.ldap_user, config.ldap_password) as conn:
-            conn.search(
-                "dc=actgenomics,dc=com",
-                f"(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))",
-                attributes=self.attributes.keys(),
-            )
-            return self.serialize_to_split_list(conn.entries, max_length)
+        entries = self.ldap_server.search(
+            "dc=actgenomics,dc=com",
+            f"(&(objectCategory=person)(objectClass=organizationalPerson)(cn=*{search_string}*))",
+            attributes=self.attributes.keys(),
+        )
+        return self.serialize_to_split_list(entries, max_length)
 
 
 if __name__ == "__main__":
-
+    import asyncio
     async def main():
-        ldap_service = LDAPService()
-        r = await ldap_service.search("Jian Siao Yu (簡孝羽)", 2000)
+        ldap_controller = LDAPController()
+        r = await ldap_controller.search("Jian Siao Yu (簡孝羽)", 2000)
         print("do next job")
         print(r)
 

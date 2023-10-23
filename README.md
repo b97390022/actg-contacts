@@ -30,6 +30,34 @@ cd actg-contacts
 docker compose up -d
 ```
 
+
+## Development
+
+#### Init environment
+```bash
+poetry install
+```
+
+#### Install pre-commit hooks
+```bash
+pre-commit install
+```
+
+#### Make sure that you install the extensions for better experience:
+- linter: Pylint [https://marketplace.visualstudio.com/items?itemName=ms-python.pylint]
+- formatter: black [https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter&ssr=false#review-details]
+
+#### Poetry scripts
+```bash
+poetry run prepare // run prepare
+poetry run audit // run audit
+poetry run lint // run linting
+poetry run build:load // docker build and load to local engine
+poetry run build:push // docker build and push to dockerhub
+poetry run start // start entrypoint main.py
+poetry run test // run linting
+```
+
 ## Contributing
 
 Pull requests are welcome. For major changes, please open an issue first

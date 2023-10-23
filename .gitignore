@@ -3,12 +3,23 @@
 # Learn more about .gitignore:
 #     https://www.atlassian.com/git/tutorials/saving-changes/gitignore
 
+# git
+**/.git
+
+# vscode
+**/.vscode/
+
 # Node artifact files
 node_modules/
 dist/
 .venv/
 .nfs*
 .env*
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Compiled Java class files
 *.class
@@ -53,5 +64,5 @@ Thumbs.db
 
 # custom
 .k8sconfig
-.vscode
 config.json
+images/

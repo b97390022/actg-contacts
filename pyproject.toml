@@ -1,10 +1,18 @@
 [tool.poetry]
 name = "actg-contacts"
 version = "0.1.0"
-description = ""
+description = "A package to search for ACTG contacts."
 authors = ["BOSHAU CHEN <b97390022@gmail.com>"]
+maintainers = [
+    "BOSHAU CHEN <b97390022@gmail.com>"
+]
 readme = "README.md"
-packages = [{include = "actg_contacts"}]
+license = "MIT"
+
+packages = [
+    { include = "./scripts/__main__.py" },
+    { include = ".venv" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -12,13 +20,29 @@ ldap3 = "^2.9.1"
 loguru = "^0.7.0"
 discord-py-interactions = "^5.7.0"
 redis = {extras = ["hiredis"], version = "^4.6.0"}
-watchdog = "^3.0.0"
 editdistance = "^0.6.2"
 openpyxl = "^3.1.2"
+levenshtein = "^0.23.0"
+xlwings = "^0.30.12"
+pillow = "^10.1.0"
 
 
 [tool.poetry.group.dev.dependencies]
-black = "^23.3.0"
+pre-commit = "^3.5.0"
+pylint = "^3.0.1"
+pip-audit = "^2.6.1"
+pytest = "^7.4.2"
+pytest-cov = "^4.1.0"
+
+[tool.poetry.scripts]
+prepare = "scripts.__main__:prepare"
+audit = "scripts.__main__:audit"
+lint = "scripts.__main__:lint"
+"build:load" = "scripts.__main__:build_load"
+"build:push" = "scripts.__main__:build_push"
+start = "scripts.__main__:start"
+test = "scripts.__main__:test"
+
 
 [build-system]
 requires = ["poetry-core"]
