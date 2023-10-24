@@ -12,6 +12,12 @@ def audit():
 def lint():
     subprocess.run(["pylint ./src"], check=False, shell=True)
 
+def format_():
+    subprocess.run(["yapf -r -d ./src"], check=False, shell=True)
+
+def format_fix():
+    subprocess.run(["yapf -r -i ./src"], check=False, shell=True)
+
 def build(option: str):
     subprocess.run([
         f"poetry export --without-hashes --format=requirements.txt > requirements.txt && docker buildx build --platform linux/amd64 --build-arg='SMB_USER={config.smb_user}' --build-arg='SMB_PWD={config.smb_password}' -t shau1943/actg-contacts:latest . {option}",

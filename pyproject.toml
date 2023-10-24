@@ -23,9 +23,7 @@ redis = {extras = ["hiredis"], version = "^4.6.0"}
 editdistance = "^0.6.2"
 openpyxl = "^3.1.2"
 levenshtein = "^0.23.0"
-xlwings = "^0.30.12"
 pillow = "^10.1.0"
-
 
 [tool.poetry.group.dev.dependencies]
 pre-commit = "^3.5.0"
@@ -33,11 +31,14 @@ pylint = "^3.0.1"
 pip-audit = "^2.6.1"
 pytest = "^7.4.2"
 pytest-cov = "^4.1.0"
+yapf = "^0.40.2"
 
 [tool.poetry.scripts]
 prepare = "scripts.__main__:prepare"
 audit = "scripts.__main__:audit"
 lint = "scripts.__main__:lint"
+format = "scripts.__main__:format_"
+"format:fix" = "scripts.__main__:format_fix"
 "build:load" = "scripts.__main__:build_load"
 "build:push" = "scripts.__main__:build_push"
 start = "scripts.__main__:start"

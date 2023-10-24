@@ -6,8 +6,11 @@ from src.config import config
 
 
 class LDAPController:
+
     def __init__(self) -> None:
-        self.ldap_server = LDAPServer(host=config.ldap_server, user=config.ldap_user, password=config.ldap_password)
+        self.ldap_server = LDAPServer(host=config.ldap_server,
+                                      user=config.ldap_user,
+                                      password=config.ldap_password)
         self.attributes: dict = {
             "cn": "姓名",
             "st": "位置",
@@ -71,13 +74,10 @@ class LDAPController:
         return result_list
 
     def serialize_autocomplete(self, entries: list):
-        return [
-            {
-                "name": getattr(entry, "cn").value,
-                "value": getattr(entry, "cn").value,
-            }
-            for entry in entries
-        ]
+        return [{
+            "name": getattr(entry, "cn").value,
+            "value": getattr(entry, "cn").value,
+        } for entry in entries]
 
     async def get_all_names(self):
         entries = self.ldap_server.search(
@@ -108,6 +108,7 @@ class LDAPController:
 
 if __name__ == "__main__":
     import asyncio
+
     async def main():
         ldap_controller = LDAPController()
         r = await ldap_controller.search("Jian Siao Yu (簡孝羽)", 2000)

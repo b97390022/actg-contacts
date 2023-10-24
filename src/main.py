@@ -12,13 +12,15 @@ MESSAGE_DELETE_DELAY = 600
 DELIMITER_COUNT = 20
 
 intents = interactions.Intents.DEFAULT | interactions.Intents.MESSAGE_CONTENT
-bot = interactions.Client(
-    intents=intents, sync_interactions=True, asyncio_debug=False, logger=logger
-)
+bot = interactions.Client(intents=intents,
+                          sync_interactions=True,
+                          asyncio_debug=False,
+                          logger=logger)
 prefixed_commands.setup(bot)
 contact_controller = ContactController()
 seating_chart_controller = SeatingChartController()
 ldap_controller = LDAPController()
+
 
 @interactions.listen()
 async def on_ready():
@@ -36,7 +38,8 @@ async def on_ready():
 async def search_contacts(ctx: interactions.SlashContext, search_string: str):
     await ctx.defer()
     ldap_coro = ldap_controller.search(search_string, DISCORD_MESSAGE_LENGTH)
-    contact_coro = contact_controller.search(search_string, DISCORD_MESSAGE_LENGTH)
+    contact_coro = contact_controller.search(search_string,
+                                             DISCORD_MESSAGE_LENGTH)
 
     for result in await ldap_coro:
         result = f"**{DELIMITER_COUNT*'-'} LDAP {DELIMITER_COUNT*'-'}**\n" + result
@@ -57,14 +60,15 @@ async def search_contacts(ctx: interactions.SlashContext, search_string: str):
     autocomplete=True,
     opt_type=interactions.OptionType.STRING,
 )
-async def search_seating_chart(ctx: interactions.SlashContext, search_string: str):
+async def search_seating_chart(ctx: interactions.SlashContext,
+                               search_string: str):
     await ctx.defer()
     seating_coro = seating_chart_controller.search(search_string)
 
     images_path = await seating_coro
     if not images_path:
         text = f"**{DELIMITER_COUNT*'-'} 座位圖 {DELIMITER_COUNT*'-'}**\n"
-        text+= "找不到結果！"
+        text += "找不到結果！"
         await ctx.send(text)
 
     else:
@@ -80,11 +84,8 @@ async def autocomplete(ctx: interactions.AutocompleteContext):
         await ctx.send(choices=[])
     else:
         # make sure this is done within three seconds
-        await ctx.send(
-            choices=ldap_controller.autocomplete_search(ctx.input_text)[
-                :DISCORD_CHOICE_LENGTH
-            ]
-        )
+        await ctx.send(choices=ldap_controller.autocomplete_search(
+            ctx.input_text)[:DISCORD_CHOICE_LENGTH])
 
 
 if __name__ == "__main__":

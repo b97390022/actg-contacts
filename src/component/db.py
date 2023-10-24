@@ -2,6 +2,7 @@ import redis
 
 
 class RedisClient:
+
     def __init__(self, password: str = None, db: int = 0) -> None:
         self.redis_url = "redis://redis:6379"
         self.password = password

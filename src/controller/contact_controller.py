@@ -2,18 +2,22 @@ from __future__ import annotations
 
 import re
 import unicodedata
-import uuid
+# import uuid
 from pathlib import Path
 
-import xlwings as xw
-from openpyxl import load_workbook
+import openpyxl
+from openpyxl.worksheet.worksheet import Worksheet
 
 from src.component.image import draw_red_circle, read_image
 from src.config import config
 from src.utils import get_file_path
 
+# from PIL import ImageGrab
+
+
 
 class ContactController:
+
     def __init__(self) -> None:
         self.src_path: str = config.env_config.contact_src_path
         self.contact_file: str = "*通訊錄*.xlsx"
@@ -33,7 +37,6 @@ class ContactController:
         }
         self.default_no_data_string: str = "無資料"
         self.split_line: str = f"{'-'*40}\n"
-
 
     def append_split_line(self, text_string: str):
         text_string += self.split_line
@@ -78,8 +81,7 @@ class ContactController:
                     "idx_email",
                 ),
                 self._get_colname_index(sheet),
-            )
-        )
+            ))
 
     def _iter_contact_data(self, sheet):
         """
@@ -107,17 +109,14 @@ class ContactController:
                     phone if phone else self.default_no_data_string,
                     office if office else self.default_no_data_string,
                     unicodedata.normalize("NFKC", department)
-                    if department
-                    else self.default_no_data_string,
-                    unicodedata.normalize("NFKC", chinese_name.replace(" ", ""))
-                    if chinese_name
-                    else self.default_no_data_string,
+                    if department else self.default_no_data_string,
+                    unicodedata.normalize("NFKC", chinese_name.replace(
+                        " ", ""))
+                    if chinese_name else self.default_no_data_string,
                     unicodedata.normalize("NFKC", english_name)
-                    if english_name
-                    else self.default_no_data_string,
+                    if english_name else self.default_no_data_string,
                     unicodedata.normalize("NFKC", email)
-                    if email
-                    else self.default_no_data_string,
+                    if email else self.default_no_data_string,
                 )
             elif finish:
                 break
@@ -127,8 +126,7 @@ class ContactController:
 
     def _get_department_all(self, sheet):
         return [
-            department
-            for (
+            department for (
                 phone,
                 office,
                 department,
@@ -143,19 +141,22 @@ class ContactController:
 
     def make_dict(self, sheet_name: str):
         contact_file_path = get_file_path(self.src_path, self.contact_file)
-        sheet = load_workbook(contact_file_path)[sheet_name]
+        sheet = openpyxl.load_workbook(contact_file_path)[sheet_name]
         self.col_index = self._parse_contact(sheet)
         excel_file_name = Path(contact_file_path).name
         # Make dictionary
-        dict_mapping_data = {"*version": excel_file_name, "*ver": excel_file_name}
+        dict_mapping_data = {
+            "*version": excel_file_name,
+            "*ver": excel_file_name
+        }
 
         for (
-            phone,
-            office,
-            department,
-            chinese_name,
-            english_name,
-            email,
+                phone,
+                office,
+                department,
+                chinese_name,
+                english_name,
+                email,
         ) in self._iter_contact_data(sheet):
             key_ = f"{english_name} ({chinese_name})"
             dict_mapping_data[key_] = {
@@ -212,6 +213,7 @@ class ContactController:
 
 
 class SeatingChartController:
+
     def __init__(self) -> None:
         self.src_path: str = config.env_config.contact_src_path
         self.seating_chart_file: str = "*座位圖*.xlsx"
@@ -223,81 +225,81 @@ class SeatingChartController:
         input_string = re.sub(r"[- ]+", "", input_string)
         return input_string
 
-    def _iter_seating_chart_data(
-        self,
-        sheet: xw.Sheet,
-        border: tuple[int, int] | None = None,
-        x: float = 0.0,
-        y: float = 0.0
-    ):
+    def _iter_seating_chart_data(self,
+                                 ws: Worksheet,
+                                 total: list[float],
+                                 x: float = 0.0,
+                                 y: float = 0.0):
         """
         generator of excel data
         """
-        if not border:
-            lrow, lcol = self._get_border(sheet)
-        else:
-            lrow, lcol = border
-
-        for i in range(lrow):
-            y=0.0
-            for j in range(lcol):
-                cell = sheet.cells(i, j)
+        for ridx, row in enumerate(ws.iter_rows()):
+            y = 0.0
+            for cell in row:
                 if cell.value and cell.value != '':
                     yield (cell, y, x)
-                y+=cell.width
-            x+=sheet.cells(i, 1).height
+                y += ws.column_dimensions[cell.coordinate].width
+            x += ws.row_dimensions[ridx].height or 0.0
+            total[0] = x
+            if total[1] == 0.0:
+                total[1] += y
 
-    def _get_all_sheets(self, wb: xw.Book) -> list[str]:
-            return wb.sheet_names
-
-    def _get_border(self, sheet: xw.Sheet):
-        return (sheet.used_range.last_cell.row, sheet.used_range.last_cell.column)
+    def _get_all_sheets(self, wb: openpyxl.Workbook):
+        return wb.worksheets
 
     def draw_circle_on_png(self, l: list[tuple[str, int, int]]) -> list:
 
         for (file_name, x, y) in l:
             image = read_image(file_name)
-            xy =  (x - self.circle_offset/2, y - self.circle_offset/2, x + self.circle_offset/2, y + self.circle_offset/2)
+            xy = (x - self.circle_offset / 2, y - self.circle_offset / 2,
+                  x + self.circle_offset / 2, y + self.circle_offset / 2)
             image = draw_red_circle(
                 image=image,
                 xy=xy,
             )
             image.save(file_name)
 
-
     async def search(self, search_string: str):
         search_string = self._formalize(search_string)
-        seating_chart_file_path = get_file_path(self.src_path, self.seating_chart_file)
+        seating_chart_file_path = get_file_path(self.src_path,
+                                                self.seating_chart_file)
         images_path = []
-        with xw.Book(seating_chart_file_path, read_only=True) as wb:
+        wb = openpyxl.load_workbook(seating_chart_file_path)
 
-            for sheet_name in  self._get_all_sheets(wb):
-                sheet: xw.Sheet = wb.sheets[sheet_name]
-                border = self._get_border(sheet)
-
-                l=[]
-                for (cell, x, y) in self._iter_seating_chart_data(sheet, border):
-                    value = self._formalize(cell.value)
-                    if value != "" and (search_string in value or value in search_string):
-                        file_name = f'images/{uuid.uuid4()}.png'
-                        l.append((file_name, x, y))
-                        sheet.range((1,1), border).to_png(file_name)
-                        images_path.append(file_name)
-                        break
-                self.draw_circle_on_png(l)
-                if images_path:
-                    break
+        for ws in self._get_all_sheets(wb):
+            # border = self._get_border(sheet)
+            total = [0.0, 0.0]
+            # l = []
+            for (cell, x, y) in self._iter_seating_chart_data(ws, total):
+                value = self._formalize(cell.value)
+                if value != "" and (search_string in value
+                                    or value in search_string):
+                    print(x, y)
+                #     # Create a screenshot using Pillow
+                #     screenshot = ImageGrab.grab(bbox=(0, 0,border[0], border[1]))
+                #     screenshot.show()
+                #     file_name = f'images/{uuid.uuid4()}.png'
+                #     l.append((file_name, x, y))
+                #     sheet.range((1,1), border).to_png(file_name)
+                #     images_path.append(file_name)
+                # break
+            print(total)
+            break
+            # self.draw_circle_on_png(l)
+            # if images_path:
+            #     break
 
         return images_path
+
 
 if __name__ == "__main__":
     import asyncio
 
     # contact_controller = ContactController()
     seating_chart_controller = SeatingChartController()
+
     # r = seating_chart_controller.get_all_sheets()
     async def main():
-        await seating_chart_controller.search("陳柏劭")
-
+        await seating_chart_controller.search("簡孝羽")
 
     asyncio.run(main())
